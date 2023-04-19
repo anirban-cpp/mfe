@@ -7,7 +7,7 @@
     Also we can additionally have UI package that may contain any component/sharable code
     from external teams like Phoenix (if needed)
 
-#   Set up github webhook scripts that will look into each sub-project or microFE when we push our code.
+#   Set up github actions scripts (CI/CD) that will look into each sub-project or microFE when we push our code.
     If any changes are made, then we will start a process that will make a production version of that microFE app with webpack
 
 #   Once production build is done, we can upload all our files to Amazon S3
@@ -19,3 +19,46 @@ Amazon S3 will have the built version of all our different sub-projects/microFEs
 
 When a file request is made, the file is not served directly from S3, instead it will make a request to Amazon CloudFront (basically a CDN)
 Basically Amazon CloudFront will see the incoming request and figure out which files to pull out of our S3 bucket and serve it back to the browser.
+
+
+For the CI/CD pipeline setup
+----------------------------
+We can make use of github actions.
+Basically whenever any github event is triggered say 'push', 'create PR', 'merge', etc, the webhook will run all workflows associated with this event
+
+
+##  Workflow for deploying container(host)
+
+Whenever code is pushed to the master branch (primary branch) and there is a commit that contains a change to the container/host folder, the following
+steps need to be performed:
+
+->  Change to container folder
+->  Install the dependencies
+->  Create a production build usig webpack
+->  Upload the result to AWS S3
+
+These commands need to be executed in the Github virtual machine
+
+
+/*
+we will be writing our container workflow and using the chrislennon/action-aws-cli@v1.1 action. 
+Unfortunately, this is now failing and appears to be no longer maintained.
+ A community fork was created to fix the issues which we can use instead:
+
+instead of this:
+
+      - uses: chrislennon/action-aws-cli@v1.1
+
+write this:
+
+      - uses: shinyinc/action-aws-cli@v1.2
+
+This updated action will require an AWS_DEFAULT_REGION key, so, for now, we can just add a placeholder.
+
+      - uses: shinyinc/action-aws-cli@v1.2
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ""
+*/
