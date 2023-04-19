@@ -1,0 +1,21 @@
+#   Set up Git monorepo which will contain all our individual micro FEs.
+    This can be done easily with turbo: "npx create-turbo@latest -e with-react-native-web"
+    Link: https://github.com/vercel/turbo/tree/main/examples/with-react-native-web
+
+#   Repo will have packages folder. This will have container (which is our main host app)
+    Along with that we will have our individual microFEs and shared (state/store).
+    Also we can additionally have UI package that may contain any component/sharable code
+    from external teams like Phoenix (if needed)
+
+#   Set up github webhook scripts that will look into each sub-project or microFE when we push our code.
+    If any changes are made, then we will start a process that will make a production version of that microFE app with webpack
+
+#   Once production build is done, we can upload all our files to Amazon S3
+
+Each microFE step should be independent. So if microFE A is changed only, then only its production build is done and uploaded to S3. Others should be affected because of that
+One can be deployed without others being deployed.
+
+Amazon S3 will have the built version of all our different sub-projects/microFEs.
+
+When a file request is made, the file is not served directly from S3, instead it will make a request to Amazon CloudFront (basically a CDN)
+Basically Amazon CloudFront will see the incoming request and figure out which files to pull out of our S3 bucket and serve it back to the browser.
