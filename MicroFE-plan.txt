@@ -37,8 +37,7 @@ steps need to be performed:
 ->  Create a production build usig webpack
 ->  Upload the result to AWS S3
 
-These commands need to be executed in the Github virtual machine
-
+These commands need to be executed in the Github virtual machine by creating a .yml file in .github/workflows
 
 /*
 we will be writing our container workflow and using the chrislennon/action-aws-cli@v1.1 action. 
@@ -62,3 +61,35 @@ This updated action will require an AWS_DEFAULT_REGION key, so, for now, we can 
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ""
 */
+
+
+Creating the S3 bucket
+----------------------
+Create the S3 bucket and change the setting to public as we want our app to be available in public domain.
+Basically 
+->  enable Static Website hosting
+->  Hosting Type: Host a static website
+->  index document: index.html
+->  error document: index.html
+->  Go to permissions and uncheck block all public access
+->  To allow AWS CloudFront CDN, go to Permissions -> Bucket Policy -> Edit -> Policy Generator
+
+Setup AWS CloudFront (CDN)
+--------------------------
+->  Search for CloudFront in AWS for Gloal CDN setup
+->  Create Distribution
+->  Select Web distribution
+->  Fill in the details: 
+    Origin Settings: Origin Domain Name, 
+    Default Cache Behavior Settings: Set Viewer Protocol Policy to edirect HTTP to HTTPS
+    Distribution Settngs: SSL Certificate -> Custom SSL Certificate for our yubi domain
+-> Create distribution
+-> Once the CloudFront distribution is created and the status is saying deployed, click on the distribution -> edit and go to 
+    default Root Object and set it to "/container/latest/index.html"
+-> Then go to the bottom and click on Yes Edit.
+-> Also, go to Error Pages.
+    Create Custom Error Response and set the HTTP Error Code to say 403 Forbidden.
+    Customize Error Response to Yes
+    Provide Response Path as "/container/latest/index.html"
+    Change HTTP response code to 200 OK
+    Ans click on create
