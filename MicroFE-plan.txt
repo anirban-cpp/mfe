@@ -182,3 +182,6 @@ So we have to invalidate thta
     Command: aws cloudfront create-invalidation --distribution-id ${{ our distribution id }}
 
 This "our distribution id" can be provided from our Github Secrets
+
+Add PRODUCTION_DOMAIN secret to github secrets
+Update github workflow and the webpack.prod.js config file such that the outputFile has a publicPath property: publicPath: '/appName/latest/'
