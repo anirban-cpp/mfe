@@ -167,3 +167,18 @@ Copy the Access Key ID and the Secret access key
 -> The AWS_ACCESS_KEY_ID secret should have a name of AWS_ACCESS_KEY_ID and value of what was there for 'Access Key ID'
 -> Same for AWS_SECRET_ACCESS_KEY
 -> Also for AWS_S3_BUCKET_NAME
+
+Caching issue with AWS CloudFront
+---------------------------------
+
+Since CloudFront does caching, it will not check for any file changes in our S# for deployment.
+So we have to invalidate thta
+
+->  Go to CloudFront Distributions.
+->  Open up our distribution.
+->  Create Invalidation.
+->  give the path to the index.html file (/container/latest/index.html)
+->  A better way is to automate this with our github workflow webhook.
+    Command: aws cloudfront create-invalidation --distribution-id ${{ our distribution id }}
+
+This "our distribution id" can be provided from our Github Secrets
