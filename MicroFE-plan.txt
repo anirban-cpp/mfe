@@ -314,3 +314,57 @@ Create IAM user
 15. Scroll down and tick the "I understand..." check box and click "Next"
 
 16. Copy and/or download the Access Key ID and Secret Access Key to use for deployment.
+
+Routing
+-------
+
+->  Navigation around subapps/microFEs is controlled from the container using its own routing logic
+->  Navigation inside each microFE/subapp is built inside the subapp/microFE using its own routing logic
+->  New routes added to the subApp/microFE shouldn't require a re-deploy of the container app
+->  Navigation should work in both hosted and isolated mode
+->  Route information shared between different microFEs should be done in a generic fashion like using callbacks not framework/library dependent.
+
+So basically, the container route will simply decide which microFE to show, whereas each microFE should decide which page inside the micro FE app, it should show.
+
+Routers maintain browserHistory, hashHistory and MemoryHistory.
+
+Solution
+--------
+
+The Container/Host will use -> BrowserHistory. This is because we want only our container to have access to the browser address bar directly
+since it has direct access to HTML5 History API when available, and falls back to full refreshes otherwise.
+The BrowserRouter component from react-router-dom uses the browserHistory.
+So if our container is using React, setting up React-router-dom in the container is enough for it to use the browerHistory.
+
+The individual microFEs will use -> MemoryHistory. Basically the microFEs/subApps will have their own copy of what the current url is and thus
+they can change that in any way they please without affecting what is there in the address bar. Basically they keep the URL changes in memory
+and not in the user's browser.
+
+Communication between MemoryRouter and BrowserRouter
+----------------------------------------------------
+
+To make things generic, all communications between different microFEs will happen via callbacks.
+So communication between the BrowserRouter in container and MemoryRouter in the other microFEs will also happen via callbacks.
+
+Container
+    |
+    |   pass a callback function say onNavigate
+    |
+   \ /
+Marketing(MicroFE)
+
+Now, whenever some clicks on a link say pricing in our marketing microFE, MemoryRouter will handle the routing in the marketing App.
+So in memory of Marketing app, the path changes to /pricing. At the same time, we will call onNavigate to tell the container that the
+current path has changed, so it needs to update the BrowserHistory (to show the changed url in the address bar)
+
+** Important Point to consider for routing
+
+If we don't set the publicPath property in our webpack.config file,
+the scripts for our remote Apps will be loaded from the remoteEntry.js file relative to the URL that we loaded remoteEntry.js file from.
+
+So, for example if we try to access marketing app from container w/o publicPath set, it will access the remoteEntry.js file
+from the url: http://localhost:8081/remoteEntry.js to load the main.js file for marketingApp.
+
+Same for our auth file which is hosted at localhost:8082, it tries to get the main.js file from http://localhost:8082/remoteEntry.js for the route /auth.
+However, since we have provided the route as /auth/signin, it is now trying to look for the main.js file in http://localhost:8082/auth/remoteEntry.js and thus is not able to find the main.js file.
+Now if we set up the publicPath for this (auth microFE), 
