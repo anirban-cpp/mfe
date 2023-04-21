@@ -1,10 +1,10 @@
-import React from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import React from 'react'
+import AppBar from '@material-ui/core/AppBar'
+import Button from '@material-ui/core/Button'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import { makeStyles } from '@material-ui/core/styles'
+import { Link as RouterLink, useHistory } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -52,16 +52,20 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: theme.spacing(6),
     },
   },
-}));
+}))
 
-export default function Header({ signedIn, onSignOut }) {
-  const classes = useStyles();
+export default function Header({ currentUser, onSignOut }) {
+  const classes = useStyles()
+  const history = useHistory()
 
   const onClick = () => {
-    if (signedIn && onSignOut) {
-      onSignOut();
+    if (currentUser && onSignOut) {
+      onSignOut()
     }
-  };
+  }
+
+  if(currentUser)
+    history.push('/')
 
   return (
     <React.Fragment>
@@ -81,18 +85,27 @@ export default function Header({ signedIn, onSignOut }) {
           >
             App
           </Typography>
+          {currentUser && (
+            <Typography
+              variant="h6"
+              color="inherit"
+              noWrap
+            >
+              Welcome {currentUser?.firstName}
+            </Typography>
+          )}
           <Button
             color="primary"
             variant="outlined"
             className={classes.link}
             component={RouterLink}
-            to={signedIn ? '/' : '/auth/signin'}
             onClick={onClick}
+            to={currentUser ? '/' : '/auth/signin'}
           >
-            {signedIn ? 'Logout' : 'Login'}
+            {currentUser ? 'Logout' : 'Login'}
           </Button>
         </Toolbar>
       </AppBar>
     </React.Fragment>
-  );
+  )
 }

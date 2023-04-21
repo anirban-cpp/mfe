@@ -368,3 +368,14 @@ from the url: http://localhost:8081/remoteEntry.js to load the main.js file for 
 Same for our auth file which is hosted at localhost:8082, it tries to get the main.js file from http://localhost:8082/remoteEntry.js for the route /auth.
 However, since we have provided the route as /auth/signin, it is now trying to look for the main.js file in http://localhost:8082/auth/remoteEntry.js and thus is not able to find the main.js file.
 Now if we set up the publicPath for this (auth microFE), 
+
+Authentication
+--------------
+
+Auth app will simply be used for signing in/signing out users.
+We will not have the auth state managed inside it because if we do that, then it will need to loaded everytime, we need the auth state access.
+
+To solve this we have 2 approaches:
+
+-> Each subApp/microFE is aware of auth -> Results in Code Duplication
+-> Centralize the auth state in the Container   -> Better solution

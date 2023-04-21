@@ -2,7 +2,7 @@ import React from 'react'
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-const useStyles = makeStyles((theme) => {
+const useStyles = makeStyles(() => {
   return createStyles({
     container: {
         width: '100%',
