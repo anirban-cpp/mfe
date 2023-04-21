@@ -65,7 +65,7 @@ export default function Header({ currentUser, onSignOut }) {
   }
 
   if(currentUser)
-    history.push('/')
+    history.push('/dashboard')
 
   return (
     <React.Fragment>

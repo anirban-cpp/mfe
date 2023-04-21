@@ -8,6 +8,7 @@ import Progress from './components/Progress'
 
 const MarketingApp = React.lazy(() => import('./components/MarketingApp'))
 const AuthApp = React.lazy(() => import('./components/AuthApp'))
+const DashboardApp = React.lazy(() => import('./components/DashoardApp'))
 
 const generateClassName = createGenerateClassName({
   productionPrefix: 'container',
@@ -16,9 +17,6 @@ const generateClassName = createGenerateClassName({
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null)
   const [users, setUsers] = useState()
-
-  console.log('users', users)
-  console.log('currentUser', currentUser)
 
   const SignIn = (user) => {
     let doesUserExist = false
@@ -61,6 +59,9 @@ const App = () => {
                   onSignIn={(user) => SignIn(user)}
                   onSignUp={(user) => SignUp(user)}
                 />
+              </Route>
+              <Route path="/dashboard">
+                <DashboardApp currentUser={currentUser}/>
               </Route>
               <Route path="/" component={MarketingApp} />
             </Switch>
